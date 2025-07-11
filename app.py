@@ -28,7 +28,7 @@ def handle_form():
     elif user and user["Link"] == True:
         return render_template('dashboard.html', name=user['Username'], show = True)
     else:
-        return render_template('index.html', error="Invalid email or password")
+        return render_template('index.html', error="Invalid email or password",perror = True)
 
 @app.route('/forget', methods=['GET','POST'])
 def forget_password():
@@ -42,7 +42,11 @@ def signup():
 def check_user():
     email = request.form['email']
     phone = request.form['phone']
-    user = usercollection.find_one({"Email": email, "Phone": phone})
+    
+    if not phone.isdigit() or len(phone) != 10:
+        return render_template('forget.html', error="Please enter a valid 10-digit phone number.")
+    
+    user = usercollection.find_one({"Email": email, "Phone": int(phone)})
     if user:
         session['username'] = user['Username']
         return render_template('reset.html')
@@ -58,7 +62,7 @@ def reset_password():
         if name:
             usercollection.update_one({"Username": name}, {"$set": {"Password": password1}})
             session.pop('username', None)
-            return render_template('index.html', message="Password updated successfully")
+            return render_template('index.html', message="Password updated successfully",perror = False)
         else:
             return render_template('forget.html', error="Session expired. Please try again.")
     else:
@@ -70,7 +74,8 @@ def create_user():
     email = request.form['email']
     phone = request.form['phone']
     password = request.form['password']
-    
+    if not phone.isdigit() or len(phone) != 10:
+        return render_template('create.html', error="Please enter a valid 10-digit phone number")
     if usercollection.find_one({"Email": email}):
         return render_template('create.html', error="Email already exists")
     elif usercollection.find_one({"Phone": phone}):
@@ -85,11 +90,11 @@ def create_user():
         "Link": False
     })
     
-    return render_template('index.html', message="User created successfully. Please login.")
+    return render_template('index.html', message="User created successfully. Please login.",perror = False)
 
 @app.route('/login-page', methods=['POST'])
 def home():
-    return render_template('index.html')
+    return render_template('index.html',perror = False)
 
 @app.route('/link', methods=['POST'])
 def link_account():
@@ -105,13 +110,13 @@ def link_account():
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
-    return render_template('index.html', message="Logged out successfully")
+    return render_template('index.html', message="Logged out successfully",perror = False)
 
 @app.route('/balance', methods=['POST'])
 def show_balance():
     phone = session.get('phone')
     if not phone:
-        return render_template('index.html', error="Please login first")
+        return render_template('index.html', error="Please login first",perror = False)
 
     user = usercollection.find_one({"Phone": phone})
     bank = bankcollection.find_one({"Phone": phone})
@@ -122,20 +127,20 @@ def show_balance():
     elif user:
         return render_template('dashboard.html', name=user['Username'], error="Bank Server Down", show=True)
     else:
-        return render_template('index.html', error="User session expired. Please login again.")
+        return render_template('index.html', error="User session expired. Please login again.",perror = False)
 
 @app.route('/hide', methods=['POST'])
 def hide_balance():
     name = session.get('name')
     if not name:
-        return render_template('index.html', error="Session expired. Please login again.")
+        return render_template('index.html', error="Session expired. Please login again.",perror = False)
     return render_template('dashboard.html',name = name , show=True)
 
 @app.route('/transfer', methods=['POST'])
 def transfer():
     phone = session.get('phone')
     if not phone:
-        return render_template('index.html', error="Session expired. Please login again.")
+        return render_template('index.html', error="Session expired. Please login again.",perror = False)
 
     user = usercollection.find_one({"Phone": phone})
     bank = bankcollection.find_one({"Phone": phone})
@@ -143,19 +148,19 @@ def transfer():
     if user and bank:
         return render_template('transaction.html')
     else:
-        return render_template('index.html', error="User session expired. Please login again.")
+        return render_template('index.html', error="User session expired. Please login again.",perror = False)
 
 @app.route('/transaction', methods=['POST'])
 def transaction():
     phone = session.get('phone')
     if not phone:
-        return render_template('index.html', error="Session expired. Please login again.")
+        return render_template('index.html', error="Session expired. Please login again.",perror = False)
 
     user = usercollection.find_one({"Phone": phone})
     bank = bankcollection.find_one({"Phone": phone})
     
     if not user or not bank:
-        return render_template('index.html', error="User session expired. Please login again.")
+        return render_template('index.html', error="User session expired. Please login again.",perror = False)
     
     upiid = request.form['UPIID']
     rupi = bankcollection.find_one({"UPIID": upiid})
@@ -181,6 +186,18 @@ def transaction():
     bankcollection.update_one({"UPIID": upiid}, {"$inc": {"Balance": amount}})
     bankcollection.update_one({"Phone": phone}, {"$inc": {"Balance": -amount}})
     return render_template('dashboard.html', name=user['Username'], message=f"Transaction successful! Amount transferred: {amount}", show=True)
+
+@app.route('/dashboard', methods=['GET','POST'])
+def dashboard():
+    phone = session.get('phone')
+    if not phone:
+        return render_template('index.html', error="Session expired. Please login again.",perror = False)
+
+    user = usercollection.find_one({"Phone": phone})
+    if not user:
+        return render_template('index.html', error="User session expired. Please login again.",perror = False)
+
+    return render_template('dashboard.html', name=user['Username'], show=True)
 
 if __name__ == '__main__':
     app.run(debug=True)

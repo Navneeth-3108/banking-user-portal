@@ -1,0 +1,193 @@
+
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #d8e2dc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Login,.forget,.reset,.create,.welcome,.dashboard,.transaction {
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 320px;
+}
+
+.Login input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.Login button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #80b918;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.Login button:hover {
+  opacity: 0.8;
+}
+
+.forget input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.forget button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #80b918;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.forget button:hover {
+  opacity: 0.8;
+}
+
+.reset input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.reset button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #80b918;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.reset button:hover {
+  opacity: 0.8;
+}
+
+.create input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.create button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #80b918;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.create button:hover {
+  opacity: 0.8;
+}
+
+.welcome input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.welcome button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #80b918;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.welcome button:hover {
+  opacity: 0.8;
+}
+
+.dashboard input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.dashboard button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #80b918;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.dashboard button:hover {
+  opacity: 0.8;
+}
+.transaction input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.transaction button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #80b918;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.transaction button:hover {
+  opacity: 0.8;
+}

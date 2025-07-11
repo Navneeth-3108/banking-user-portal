@@ -4,21 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Password Reset</title>
+    <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
-    <h1>Password Reset</h1>
-    <form action="/check" method="POST">
-        <div>
-            <input type="email" name="email" placeholder="Enter your email" required>
-            <input type="phone" name="phone" placeholder="Enter your phone number" required>
-            {% if error %}
-                <p style="color: red;">{{ error }}</p>
-            {% endif %}
-        </div>
-        <button type="submit">Reset Password</button>
-    </form>
-    <form action="/login-page" method="POST">
-        <button type="submit">Back</button>
-    </form>
+    <div class ="forget">
+        <h1>Password Reset</h1>
+        <form action="/check" method="POST">
+            <div>
+                <input type="email" name="email" placeholder="Enter your email" required>
+                <input type="tel" name="phone" placeholder="Enter your phone number" required>
+                {% if error %}
+                    <p style="color: red;">{{ error }}</p>
+                {% endif %}
+            </div>
+            <button type="submit">Reset Password</button>
+        </form>
+        <form action="/login-page" method="POST">
+            <button type="submit">Back</button>
+        </form>
+    </div>
 </body>
 </html>
