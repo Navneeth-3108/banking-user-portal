@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction</title>
+</head>
+<body>
+    <form action="/transaction" method="POST">
+      <input class="UPIID" type="text" name="UPIID" placeholder="Enter the UPI ID Of reciepient" required>
+      <input class="amount" type="number" name="amount" placeholder="Enter the Amount" required>
+      <input class="UPIPIN" type="text" name="UPIPIN" placeholder="Enter the UPI PIN" required>
+      {% if error %}
+          <p style="color: red;">{{ error }}</p>
+      {% endif %}
+      {% if success %}
+          <p style="color: green;">{{ success }}</p>
+          <p style="color: green;">{{ Balance }}</p>
+      {% endif %}
+      <button type="submit">Make Transaction</button>
+    </form>
+</body>
+</html>

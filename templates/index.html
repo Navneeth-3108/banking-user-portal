@@ -22,9 +22,11 @@
       <button type="submit">Login</button>
     </div>
   </form>
-  <form action="/forget" method="POST">
-    <button type="submit">Forgot Password</button>
-  </form>
+  {% if error %}
+    <form action="/forget" method="POST">
+      <button type="submit">Forgot Password</button>
+    </form>
+  {% endif %}
   <form action="/signup" method="POST">
     <button type="submit">Sign Up</button>
   </form>
