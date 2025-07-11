@@ -9,7 +9,7 @@ body, html {
   align-items: center;
 }
 
-.Login,.forget,.reset,.create,.welcome,.dashboard,.transaction {
+.Login,.forget,.reset,.create,.welcome,.dashboard,.transaction,.otp {
   background-color: #fff;
   padding: 40px;
   border-radius: 12px;
@@ -189,5 +189,30 @@ body, html {
 }
 
 .transaction button:hover {
+  opacity: 0.8;
+}
+
+.otp input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.otp button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #80b918;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.otp button:hover {
   opacity: 0.8;
 }

@@ -1,10 +1,18 @@
 from flask import Flask, render_template, request, session
 from pymongo import MongoClient
-import os
+import os, random
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 client = MongoClient("mongodb://localhost:27017/")
 app.secret_key = os.urandom(24)
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'your-mail@gmail.com'
+app.config['MAIL_PASSWORD'] = 'your-app-password'
+mail = Mail(app)
 
 db = client["Banking"]
 usercollection = db["User_details"]
@@ -82,15 +90,56 @@ def create_user():
         return render_template('create.html', error="Phone number already exists")
     elif usercollection.find_one({"Username": username}):
         return render_template('create.html', error="Username already exists")
-    usercollection.insert_one({
-        "Username": username,
-        "Email": email,
-        "Phone": int(phone),
-        "Password": password,
-        "Link": False
-    })
-    
-    return render_template('index.html', message="User created successfully. Please login.",perror = False)
+    otp = random.randint(100000, 999999)
+    session['otp'] = otp
+    session['email'] = email
+    session['username'] = username
+    session['phone'] = phone
+    session['password'] = password
+    msg = Message(
+        subject="Email Verification for Banking App",
+        sender=app.config['MAIL_USERNAME'],
+        recipients=[session['email']],
+        body=f"Hi {username},\n\nThank you for signing up! Your OTP for email verification is: {otp}\n\nPlease use this OTP to complete your registration.\n\nBest regards,\nBanking App Team"
+    )
+    mail.send(msg)
+    return render_template('otp.html')
+
+@app.route('/otp', methods=['POST'])
+def verify_otp():
+    entered_otp = request.form['otp']
+    if 'otp' in session and entered_otp == str(session['otp']):
+        usercollection.insert_one({
+            "Username": session['username'],
+            "Email": session['email'],
+            "Phone": int(session['phone']),
+            "Password": session['password'],
+            "Link": False
+        })
+        session.pop('otp', None)
+        session.pop('email', None)
+        session.pop('username', None)
+        session.pop('phone', None)
+        session.pop('password', None)
+        return render_template('index.html', message="User created successfully. Please login.",perror = False)
+    else:
+        return render_template('otp.html', error="Invalid OTP. Please try again.")
+
+@app.route('/resend', methods=['POST'])
+def resend_otp():
+    if 'email' in session and 'username' in session:
+        otp = random.randint(100000, 999999)
+        session['otp'] = otp
+        msg = Message(
+            subject="Email Verification for Banking App",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[session['email']],
+            body=f"Hi {session['username']},\n\nYour OTP for email verification is: {otp}\n\nPlease use this OTP to complete your registration.\n\nBest regards,\nBanking App Team"
+        )
+        mail.send(msg)
+        return render_template('otp.html', message="OTP resent successfully.")
+    else:
+        return render_template('create.html', error="Session expired. Please try again.")
 
 @app.route('/login-page', methods=['POST'])
 def home():
