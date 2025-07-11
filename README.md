@@ -8,7 +8,7 @@ A secure and user-friendly banking web application built using Flask, MongoDB, a
 
 - User registration with email OTP verification
 - Login and session management
-- Password reset using phone number and email
+- Password reset using email verification
 - Account linking with bank details
 - Balance view and hide feature
 - Secure money transfer between accounts via UPI ID
@@ -85,7 +85,7 @@ The app will be available at: [http://localhost:5000](http://localhost:5000)
 3. **Link Bank Account**: Add your bank details and UPI ID
 4. **View Balance**: Check your account balance (with hide/show option)
 5. **Transfer Funds**: Send money to other users using their UPI ID
-6. **Password Reset**: Reset forgotten passwords using phone number
+6. **Password Reset**: Reset forgotten passwords using email verification
 
 ---
 
@@ -105,7 +105,8 @@ banking-app/
     ├── forget.html         # Forgot password
     ├── reset.html          # Password reset
     ├── create.html         # Account creation
-    ├── otp.html            # OTP verification
+    ├── otp.html            # OTP verification (signup)
+    ├── pwotp.html          # OTP verification (password reset)
     └── transaction.html    # Transaction page
 ```
 
@@ -190,7 +191,9 @@ For questions or support, please create an issue in this repository.
 | Method | Endpoint | Description | Parameters |
 |--------|----------|-------------|------------|
 | `GET` | `/forget` | Show forgot password page | None |
-| `POST` | `/check` | Verify user for password reset | `email`, `phone` |
+| `POST` | `/check` | Verify user email for password reset | `email` |
+| `POST` | `/pwotp` | Verify OTP for password reset | `otp` |
+| `POST` | `/pwresend` | Resend password reset OTP | None |
 | `POST` | `/reset` | Reset user password | `password1`, `password2` |
 
 ### OTP Verification
@@ -198,7 +201,7 @@ For questions or support, please create an issue in this repository.
 | Method | Endpoint | Description | Parameters |
 |--------|----------|-------------|------------|
 | `POST` | `/otp` | Verify OTP for account creation | `otp` |
-| `POST` | `/resend` | Resend OTP | None |
+| `POST` | `/resend` | Resend signup OTP | None |
 
 ### Account Management
 
@@ -240,6 +243,24 @@ curl -X POST http://localhost:5000/login \
   -d "email=john@example.com&password=mypassword"
 ```
 
+#### Password Reset Flow
+```bash
+# Step 1: Request password reset
+curl -X POST http://localhost:5000/check \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "email=john@example.com"
+
+# Step 2: Verify OTP
+curl -X POST http://localhost:5000/pwotp \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "otp=123456"
+
+# Step 3: Reset password
+curl -X POST http://localhost:5000/reset \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "password1=newpassword&password2=newpassword"
+```
+
 #### Money Transfer
 ```bash
 # POST /transaction
@@ -259,5 +280,28 @@ curl -X POST http://localhost:5000/transaction \
 - Form validation errors display on respective forms
 - Session expiry redirects to login page
 - Database errors handled gracefully
+
+---
+
+## 🔄 Application Workflows
+
+### User Registration Flow
+1. **Sign Up** → Enter username, email, phone, password → `/create`
+2. **Email Sent** → OTP sent to user's email
+3. **OTP Verification** → Enter OTP → `/otp` → Account created
+4. **Login** → Use email and password → `/login`
+
+### Password Reset Flow
+1. **Forgot Password** → Enter email → `/check`
+2. **Email Verification** → OTP sent to email
+3. **OTP Verification** → Enter OTP → `/pwotp`
+4. **Reset Password** → Enter new password → `/reset`
+5. **Login** → Use new credentials
+
+### Banking Operations Flow
+1. **Login** → Access dashboard or welcome page
+2. **Link Account** → Connect bank details (if not linked)
+3. **Dashboard Access** → View balance, transfer money, logout
+4. **Money Transfer** → Enter UPI ID, amount, PIN → Transaction complete
 
 ---

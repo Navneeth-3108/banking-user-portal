@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification</title>
+    <title>Password Reset</title>
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
     <div class="otp">
-        <form action="/otp" method="post">
-            <h2>Email Verification</h2>
-            <p>We have sent a verification code to your email. Please enter it below:</p>
+        <form action="/pwotp" method="post">
+            <h2>Password Reset</h2>
+            <p>We have sent OTP to your email. Please enter it below:</p>
             <input type="text" name="otp" placeholder="Enter OTP" required>
             {% if error %}
                 <p style="color: red;">{{ error }}</p>
@@ -20,7 +20,7 @@
             {% endif %}
             <button type="submit">Verify</button>
             <p>Didn't receive the code? 
-                <form action="/resend" method="POST" style="display: inline;">
+                <form action="/pwresend" method="POST" style="display: inline;">
                     <button type="submit" style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer;">Resend OTP</button>
                 </form>
             </p>

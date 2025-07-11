@@ -12,7 +12,6 @@
         <form action="/check" method="POST">
             <div>
                 <input type="email" name="email" placeholder="Enter your email" required>
-                <input type="tel" name="phone" placeholder="Enter your phone number" required>
                 {% if error %}
                     <p style="color: red;">{{ error }}</p>
                 {% endif %}

@@ -49,32 +49,70 @@ def signup():
 @app.route('/check', methods=['POST'])
 def check_user():
     email = request.form['email']
-    phone = request.form['phone']
-    
-    if not phone.isdigit() or len(phone) != 10:
-        return render_template('forget.html', error="Please enter a valid 10-digit phone number.")
-    
-    user = usercollection.find_one({"Email": email, "Phone": int(phone)})
+    user = usercollection.find_one({"Email": email})
     if user:
+        session['email'] = email
         session['username'] = user['Username']
+        username = user['Username']
+        otp = random.randint(100000, 999999)
+        session['otp'] = otp
+        msg = Message(
+            subject="Password Reset for Banking App",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[email],
+            body=f"Hi {username},\n\nYour OTP for Password Reset is: {otp}\n\nPlease use this OTP to change your password.\n\nRegards,\nBanking App Team"
+        )
+        mail.send(msg)
+        return render_template('pwotp.html')
+    else:
+        return render_template('forget.html', error="Email not found. Please check your email address.")
+
+@app.route('/pwotp', methods=['POST'])
+def verify_pw_otp():
+    entered_otp = request.form['otp']
+    if 'otp' in session and entered_otp == str(session['otp']):
+        user = usercollection.find_one({"Email": session['email']})
+        if not user:
+            return render_template('forget.html', error="Session expired. Please try again.")
+        session.pop('otp', None)
         return render_template('reset.html')
     else:
-        return render_template('forget.html', error="Please check your email and phone number.")
+        return render_template('pwotp.html', error="Invalid OTP. Please try again.")
+
 
 @app.route('/reset', methods=['POST'])
 def reset_password():
     password1 = request.form['password1']
     password2 = request.form['password2']
     if password1 == password2:
-        name = session.get('username')
-        if name:
-            usercollection.update_one({"Username": name}, {"$set": {"Password": password1}})
+        username = session.get('username')
+        email = session.get('email')
+        if username and email:
+            usercollection.update_one({"Username": username}, {"$set": {"Password": password1}})
             session.pop('username', None)
-            return render_template('index.html', message="Password updated successfully",perror = False)
+            session.pop('email', None)
+            return render_template('index.html', message="Password updated successfully", perror=False)
         else:
             return render_template('forget.html', error="Session expired. Please try again.")
     else:
         return render_template('reset.html', error="Passwords do not match")
+
+@app.route('/pwresend', methods=['POST'])
+def resend_pw_otp():
+    if 'email' in session and 'username' in session:
+        username = session['username']
+        otp = random.randint(100000, 999999)
+        session['otp'] = otp
+        msg = Message(
+            subject="Password Reset for Banking App",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[session['email']],
+            body=f"Hi {username},\n\nYour OTP for Password Reset is: {otp}\n\nPlease use this OTP to change your password.\n\nRegards,\nBanking App Team"
+        )
+        mail.send(msg)
+        return render_template('pwotp.html', message="OTP resent successfully.")
+    else:
+        return render_template('forget.html', error="Session expired. Please try again.")
 
 @app.route('/create', methods=['GET','POST'])
 def create_user():
@@ -106,7 +144,7 @@ def create_user():
     return render_template('otp.html')
 
 @app.route('/otp', methods=['POST'])
-def verify_otp():
+def verify_signup_otp():
     entered_otp = request.form['otp']
     if 'otp' in session and entered_otp == str(session['otp']):
         usercollection.insert_one({
@@ -121,12 +159,12 @@ def verify_otp():
         session.pop('username', None)
         session.pop('phone', None)
         session.pop('password', None)
-        return render_template('index.html', message="User created successfully. Please login.",perror = False)
+        return render_template('index.html', message="User created successfully. Please login.", perror=False)
     else:
         return render_template('otp.html', error="Invalid OTP. Please try again.")
 
 @app.route('/resend', methods=['POST'])
-def resend_otp():
+def resend_signup_otp():
     if 'email' in session and 'username' in session:
         otp = random.randint(100000, 999999)
         session['otp'] = otp
