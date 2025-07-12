@@ -7,13 +7,14 @@ A secure and user-friendly banking web application built using Flask, MongoDB, a
 ## 🔧 Features
 
 - User registration with email OTP verification
-- Login and session management
+- Secure login and session management with bcrypt password hashing
 - Password reset using email verification
 - Account linking with bank details
 - Balance view and hide feature
 - Secure money transfer between accounts via UPI ID
 - Email notifications using Gmail SMTP
 - MongoDB backend for storing user and account details
+- Input validation for phone numbers, emails, and UPI PINs
 
 ---
 
@@ -22,6 +23,7 @@ A secure and user-friendly banking web application built using Flask, MongoDB, a
 - **Backend**: Flask (Python)
 - **Database**: MongoDB (via PyMongo)
 - **Email Service**: Flask-Mail (Gmail SMTP)
+- **Security**: bcrypt for password hashing
 
 ---
 
@@ -31,7 +33,7 @@ A secure and user-friendly banking web application built using Flask, MongoDB, a
 
 ```bash
 git clone https://github.com/Navneeth-3108/banking-user-portal.git
-cd banking-app
+cd banking-user-portal
 ```
 
 ### 2. Set up a virtual environment (optional but recommended)
@@ -92,7 +94,7 @@ The app will be available at: [http://localhost:5000](http://localhost:5000)
 ## 📁 Folder Structure
 
 ```
-banking-app/
+banking-user-portal/
 ├── app.py                  # Main Flask application
 ├── requirements.txt        # Python dependencies
 ├── README.md               # Project documentation
@@ -132,6 +134,7 @@ Flask==2.3.3           # Web framework
 pymongo==4.7.0         # MongoDB driver
 Flask-Mail==0.9.1      # Email functionality
 dnspython==2.4.2       # DNS toolkit (required by pymongo)
+bcrypt==4.0.1          # Password hashing library
 ```
 
 Install all dependencies with: `pip install -r requirements.txt`
@@ -140,15 +143,48 @@ Install all dependencies with: `pip install -r requirements.txt`
 
 ## 🔒 Security Notes
 
-⚠️ **Important Security Considerations:**
+⚠️ **Security Features Implemented:**
 
-- This is a **demo application** - not suitable for production use
-- Passwords are stored in plain text (use proper hashing in production)
-- Use environment variables for sensitive data
+- **Secure Password Storage** - Passwords are hashed using bcrypt with salt
+- **Session Management** - Secure session handling with server-side validation
+- **OTP Verification** - Email-based OTP for account creation and password reset
+- **Input Validation** - Phone number, email, and UPI PIN validation
+- **Duplicate Prevention** - Prevents duplicate usernames, emails, and phone numbers
+
+⚠️ **Additional Security Considerations for Production:**
+
+- Use environment variables for sensitive data (already recommended)
 - Enable 2FA and use App Passwords for Gmail
 - Implement proper input validation and sanitization
 - Add rate limiting for login attempts
 - Use HTTPS in production
+- Implement CSRF protection
+- Add proper logging and monitoring
+
+---
+
+## 🔐 Password Security Implementation
+
+This application implements secure password handling using bcrypt:
+
+### Password Hashing
+```python
+import bcrypt
+
+# During registration - hash the password
+password = request.form['password'].encode('utf-8')
+hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
+
+# During login - verify the password
+if user and bcrypt.checkpw(password, user["Password"]):
+    # Login successful
+```
+
+### Security Features
+- **Salt Generation**: Each password gets a unique salt
+- **Bcrypt Algorithm**: Industry-standard password hashing
+- **Verification**: Secure password comparison without storing plain text
+- **Session Security**: Proper session management and cleanup
 
 ---
 

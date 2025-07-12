@@ -1,6 +1,6 @@
+import os, random, bcrypt
 from flask import Flask, render_template, request, session
 from pymongo import MongoClient
-import os, random
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
@@ -25,16 +25,18 @@ def show_form():
 @app.route('/login', methods=['GET','POST'])
 def handle_form():
     email = request.form['email']
-    password = request.form['password']
-    user = usercollection.find_one({"Email": email, "Password": password})
-    if user:
+    password = request.form['password'].encode('utf-8')
+    user = usercollection.find_one({"Email": email})
+    
+    if user and bcrypt.checkpw(password, user["Password"]):
         session['phone'] = user["Phone"]
         session['name'] = user['Username']
         session['email'] = user['Email']
-    if user and user["Link"]== False:
-        return render_template('welcome.html', name=user['Username'])
-    elif user and user["Link"] == True:
-        return render_template('dashboard.html', name=user['Username'], show = True)
+        
+        if user["Link"] == False:
+            return render_template('welcome.html', name=user['Username'])
+        elif user["Link"] == True:
+            return render_template('dashboard.html', name=user['Username'], show = True)
     else:
         return render_template('index.html', error="Invalid email or password",perror = True)
 
@@ -85,10 +87,11 @@ def reset_password():
     password1 = request.form['password1']
     password2 = request.form['password2']
     if password1 == password2:
+        hashed_password = bcrypt.hashpw(password1.encode('utf-8'), bcrypt.gensalt())
         username = session.get('username')
         email = session.get('email')
         if username and email:
-            usercollection.update_one({"Username": username}, {"$set": {"Password": password1}})
+            usercollection.update_one({"Username": username}, {"$set": {"Password": hashed_password}})
             session.pop('username', None)
             session.pop('email', None)
             return render_template('index.html', message="Password updated successfully", perror=False)
@@ -119,7 +122,8 @@ def create_user():
     username = request.form['username']
     email = request.form['email']
     phone = request.form['phone']
-    password = request.form['password']
+    password = request.form['password'].encode('utf-8')
+    hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
     if not phone.isdigit() or len(phone) != 10:
         return render_template('create.html', error="Please enter a valid 10-digit phone number")
     if usercollection.find_one({"Email": email}):
@@ -133,7 +137,7 @@ def create_user():
     session['email'] = email
     session['username'] = username
     session['phone'] = phone
-    session['password'] = password
+    session['password'] = hashed_password
     msg = Message(
         subject="Email Verification for Banking App",
         sender=app.config['MAIL_USERNAME'],
