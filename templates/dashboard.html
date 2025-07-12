@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <div class="container">
+        {% if name %}
+            <h1>Welcome to Your Dashboard, {{ name }}!</h1>
+        {% else %}
+            <h1>Welcome to the Banking Application</h1>
+        {% endif %}
+        {% if message %}
+            <p style="color: green;">{{ message }}</p>
+        {% endif %}
+        {% if balance %}
+            <p style="color: blue;">{{ balance }}</p>
+        {% endif %}
+        {% if show %}
+            <form action="/balance" method="POST">
+                <button type="submit">Show Balance</button>
+            </form>
+        {% else %}
+            <form action="/hide" method="POST">
+                <button type="submit">Hide Balance</button>
+            </form>
+        {% endif %}
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        <form action = '/transfer' method='POST'>
+            <button type="submit">Transfer Money</button>
+        </form>
+        <form action="/logout" method="POST">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+</body>
+</html>
